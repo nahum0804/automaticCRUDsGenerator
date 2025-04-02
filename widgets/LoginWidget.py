@@ -12,7 +12,7 @@ class LoginWidget(QWidget):
         self.setWindowTitle("Acceso Futurista")
         self.setGeometry(0, 0, 1200, 800)  
 
-        # Fondo oscuro
+       
         self.setStyleSheet("""
             QWidget {
                 background-color: #121212;
@@ -55,15 +55,14 @@ class LoginWidget(QWidget):
             }
         """)
 
-        # Layout principal para centrar todo
+        
         main_layout = QVBoxLayout()
         main_layout.setAlignment(Qt.AlignCenter)
 
-        # Contenedor del formulario
         form_container = QFrame()
         form_layout = QVBoxLayout()
         form_layout.setAlignment(Qt.AlignCenter)
-        form_layout.setSpacing(20)  # MÁS ESPACIO ENTRE ELEMENTOS
+        form_layout.setSpacing(20)
 
         self.title = QLabel("INICIO DE SESIÓN")
         self.title.setAlignment(Qt.AlignCenter)

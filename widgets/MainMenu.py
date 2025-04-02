@@ -12,17 +12,14 @@ class MainMenu(QWidget):
         layout.setAlignment(Qt.AlignCenter)
         layout.setSpacing(20)
         
-        # Título
         title = QLabel("Bienvenido al Menú Principal")
         title.setStyleSheet("font-size: 24px; color: #FFFFFF;")
         title.setAlignment(Qt.AlignCenter)
         
-        # Separador
         separator = QFrame()
         separator.setFrameShape(QFrame.HLine)
         separator.setStyleSheet("color: #333333;")
         
-        # Botón de ejemplo
         example_btn = QPushButton("Menú CRUD")
         example_btn.setStyleSheet("""
             QPushButton {
@@ -39,7 +36,6 @@ class MainMenu(QWidget):
         """)
         example_btn.setCursor(Qt.PointingHandCursor)
         
-        # Agregar elementos
         layout.addWidget(title)
         layout.addWidget(separator)
         layout.addWidget(example_btn)
