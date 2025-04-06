@@ -1,7 +1,8 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from .LoginWidget import LoginWidget
 from .MainMenu import MainMenu
-import time
+import time 
+from db.dbConnector import PostgresDB   
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -22,13 +23,28 @@ class MainWindow(QMainWindow):
             self.login_widget.set_status("Todos los campos son requeridos", is_error=True)
             return
         
-        print("Credenciales ingresadas:", credentials)
         self.login_widget.set_status("Conectando...")
-
         QApplication.processEvents()
-        time.sleep(1)  
-        
-        self.show_main_menu()
+
+        # Crear instancia de PostgresDB con credenciales de administración
+        db = PostgresDB(
+            host=credentials["ip"],
+            user="postgres",  # o tu usuario admin de postgres
+            password="tu_password_postgres"  # contraseña de postgres
+        )
+
+        # Intentar conectar
+        if db.conectar():
+            # Verificar credenciales contra tabla usuarios
+            if db.verificar_usuario(credentials["user"], credentials["password"]):
+                self.login_widget.set_status("¡Conexión exitosa!")
+                self.db = db
+                self.show_main_menu()
+            else:
+                self.login_widget.set_status("Usuario o contraseña incorrectos", is_error=True)
+                db.cerrar_conexion()
+        else:
+            self.login_widget.set_status("Fallo al conectar a la base de datos", is_error=True)
 
     def show_login_screen(self):
         if self.current_widget:
