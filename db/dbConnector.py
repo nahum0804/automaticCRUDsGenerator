@@ -1,13 +1,12 @@
 import psycopg2
 import json
 class PostgresDB:
-    def __init__(self, user, password, dbname="usuariodb", port=5432):
+    def __init__(self, host , user, password, database="usuariodb"):
         self.config = {
-            "host": "127.0.0.1",  # <- Quita el .encode()
-            "user": user,
-            "password": password,
-            "dbname": dbname,
-            "port": port
+            host: "localhost",  
+            user: user,
+            password: password,
+            database: database
         }
         self.conexion = None
 
@@ -27,18 +26,19 @@ class PostgresDB:
             return False
 
     def conectar(self):
-        """Establece la conexión con la base de datos."""
-        print("Conectando a PostgreSQL...")
+        """Establece la conexión a la base de datos PostgreSQL."""
         try:
-            print("📦 Config recibida:", self.config)
-            for k, v in self.config.items():
-                print(f"{k}: {v} ({type(v)})")
-            self.conexion = psycopg2.connect(**self.config)  # <- Sin clean_config
-            print("✅ Conexión exitosa a PostgreSQL")
+            conection = psycopg2.connect(
+                host='localhost',
+                user='postgres',
+                password='Seriesfly1419',
+                database='usuariosdb'
+            )
+            self.conexion = conection
+            print("Conexión exitosa a PostgreSQL")
             return True
         except psycopg2.Error as e:
-            print("❌ Error al conectar a PostgreSQL:", e)
-            self.conexion = None
+            print("Error al conectar a PostgreSQL:", e)
             return False
 
 

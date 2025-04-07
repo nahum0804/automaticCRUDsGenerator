@@ -28,10 +28,10 @@ class MainWindow(QMainWindow):
 
         # Crear instancia de PostgresDB con credenciales de administración
         db = PostgresDB(
-            user="postgres",         # tu usuario real de PostgreSQL
-            password="1234",         # tu contraseña
-            dbname="usuariodb",      # base de datos ya creada
-            port=5432                # ¡número, no string!
+            host="localhost",         # tu host real de PostgreSQL
+            user="Postgres",         # tu usuario real de PostgreSQL
+            password="Seriesfly1419",         # tu contraseña
+            database="usuariosdb",      # base de datos ya creada
         )
 
         # Intentar conectar
