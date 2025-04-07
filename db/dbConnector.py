@@ -28,8 +28,10 @@ class PostgresDB:
 
     def conectar(self):
         """Establece la conexión con la base de datos."""
+        print("Conectando a PostgreSQL...")
         try:
-            # Asegúrate de que todos los parámetros son strings
+            print("📦 Config recibida:", self.config)  # <- Agregado
+
             clean_config = {
                 "host": str(self.config["host"]),
                 "user": str(self.config["user"]),
@@ -37,7 +39,7 @@ class PostgresDB:
                 "dbname": str(self.config["dbname"]),
                 "port": self.config["port"]
             }
-            
+
             self.conexion = psycopg2.connect(**clean_config)
             print("✅ Conexión exitosa a PostgreSQL")
             return True
@@ -45,6 +47,7 @@ class PostgresDB:
             print("❌ Error al conectar a PostgreSQL:", e)
             self.conexion = None
             return False
+
 
     def cerrar_conexion(self):
         """Cierra la conexión si está abierta."""
