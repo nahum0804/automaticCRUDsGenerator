@@ -28,23 +28,25 @@ class MainWindow(QMainWindow):
 
         # Crear instancia de PostgresDB con credenciales de administración
         db = PostgresDB(
-            host=credentials["ip"],
-            user="postgres",  # o tu usuario admin de postgres
-            password="tu_password_postgres"  # contraseña de postgres
+            user="postgres",         # tu usuario real de PostgreSQL
+            password="1234",         # tu contraseña
+            dbname="usuariodb",      # base de datos ya creada
+            port=5432                # ¡número, no string!
         )
 
         # Intentar conectar
         if db.conectar():
+            print("Conexión exitosa a PostgreSQL")
             # Verificar credenciales contra tabla usuarios
-            if db.verificar_usuario(credentials["user"], credentials["password"]):
-                self.login_widget.set_status("¡Conexión exitosa!")
-                self.db = db
-                self.show_main_menu()
-            else:
-                self.login_widget.set_status("Usuario o contraseña incorrectos", is_error=True)
-                db.cerrar_conexion()
-        else:
-            self.login_widget.set_status("Fallo al conectar a la base de datos", is_error=True)
+            # if db.verificar_usuario(credentials["user"], credentials["password"]):
+            #    self.login_widget.set_status("¡Conexión exitosa!")
+            #    self.db = db
+            #    self.show_main_menu()
+            #else:
+            #    self.login_widget.set_status("Usuario o contraseña incorrectos", is_error=True)
+            #    db.cerrar_conexion() 
+        #else:
+            #self.login_widget.set_status("Fallo al conectar a la base de datos", is_error=True)
 
     def show_login_screen(self):
         if self.current_widget:
