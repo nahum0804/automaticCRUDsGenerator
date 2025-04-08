@@ -1,14 +1,14 @@
 import psycopg2
 import json
 class PostgresDB:
-    def __init__(self, host , user, password, database="usuariodb"):
+    def __init__(self, host, user, password, database):
+        # Configuración CORRECTA (claves fijas)
         self.config = {
-            host: "localhost",  
-            user: user,
-            password: password,
-            database: database
+            "host": host,        # Usa claves consistentes
+            "user": user,
+            "password": password,
+            "database": database  # O "dbname" según psycopg2
         }
-        self.conexion = None
 
     def verificar_usuario(self, usuario, contrasena):
         """Verifica si el usuario y contraseña son válidos"""
@@ -28,13 +28,13 @@ class PostgresDB:
     def conectar(self):
         """Establece la conexión a la base de datos PostgreSQL."""
         try:
-            conection = psycopg2.connect(
-                host='localhost',
-                user='postgres',
-                password='Seriesfly1419',
-                database='usuariosdb'
+            print("los datos de la base de datos son: ", self.config)
+            self.conexion = psycopg2.connect(
+                host=self.config["host"],
+                user=self.config["user"],
+                password=self.config["password"],
+                database=self.config["database"]
             )
-            self.conexion = conection
             print("Conexión exitosa a PostgreSQL")
             return True
         except psycopg2.Error as e:
