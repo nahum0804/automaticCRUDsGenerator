@@ -26,19 +26,22 @@ class PostgresDB:
             return False
 
     def conectar(self):
-        """Establece la conexión a la base de datos PostgreSQL."""
         try:
-            print("los datos de la base de datos son: ", self.config)
             self.conexion = psycopg2.connect(
                 host=self.config["host"],
                 user=self.config["user"],
                 password=self.config["password"],
                 database=self.config["database"]
             )
-            print("Conexión exitosa a PostgreSQL")
-            return True
+            return True  # Conexión exitosa
         except psycopg2.Error as e:
-            print("Error al conectar a PostgreSQL:", e)
+            print("Error al conectar a la base de datos:", e)
+            return False
+        except UnicodeDecodeError as e:
+            print("Contraseña o usuario no válidos, por favor vuelva a intentarlo")
+            return False
+        except Exception as e:
+            print("Ocurrió un error inesperado al conectar:", e)
             return False
 
 
