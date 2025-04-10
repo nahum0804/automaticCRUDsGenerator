@@ -1,10 +1,12 @@
-from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QFrame)
+from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QFrame, QMainWindow)
 from PyQt5.QtCore import Qt
+from .MainMenu import MainMenu
 
-class TableWidget(QWidget):
+class TableWidget(QMainWindow):  # Cambié QWidget por QMainWindow
     def __init__(self, tablas, parent=None):
         super().__init__(parent)
-        self.tablas = tablas  # Aquí solo almacenamos los nombres de las tablas
+        self.tablas = tablas
+        self.current_widget = None  # Inicializar el widget actual
         self.setup_ui()
 
     def setup_ui(self):
@@ -77,7 +79,19 @@ class TableWidget(QWidget):
         main_layout.addLayout(central_layout)
         main_layout.addStretch()
 
-        self.setLayout(main_layout)
+        # Establecer el layout en el widget central
+        central_widget = QWidget()
+        central_widget.setLayout(main_layout)
+        self.setCentralWidget(central_widget)  # Esto ahora funciona
 
     def on_table_selected(self, tabla):
         print(f"Se seleccionó la tabla: {tabla}")
+        
+        # Si ya hay un widget actual, lo eliminamos
+        if self.current_widget:
+            self.current_widget.deleteLater()
+
+        # Crear y mostrar el nuevo MainMenu
+        self.main_menu = MainMenu()
+        self.setCentralWidget(self.main_menu)  # Establecer el nuevo widget
+        self.current_widget = self.main_menu  # Actualizar current_widget

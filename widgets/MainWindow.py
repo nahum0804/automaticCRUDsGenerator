@@ -60,18 +60,13 @@ class MainWindow(QMainWindow):
         self.login_widget.login_btn.clicked.connect(self.handle_login)
 
     def show_main_menu(self, user, password, ip):
-        if self.current_widget:
-            self.current_widget.deleteLater() 
-
-        self.main_menu = MainMenu()
-        self.setCentralWidget(self.main_menu)
-        self.current_widget = self.main_menu  
         print("Menú principal cargado correctamente.")
         rol = selectorTables.autenticar_usuario(user, password,ip)
         Permisos = rol["permisos"]
         tablas = selectorTables.mostrar_tablas_disponibles(Permisos)
-        widget = TableWidget(tablas)
-        widget.show()
-        print("Tablas disponibles:", tablas)
-
+        if self.current_widget:
+            self.current_widget.deleteLater() 
+        self.main_table_widget = TableWidget(tablas)
+        self.setCentralWidget(self.main_table_widget)
+        self.current_widget = self.main_table_widget 
    
