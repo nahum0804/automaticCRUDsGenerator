@@ -4,6 +4,7 @@ from .MainMenu import MainMenu
 import time 
 from db.dbConnector import PostgresDB   
 from helpers import selectorTables
+from widgets.TableWidget import TableWidget
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -69,4 +70,8 @@ class MainWindow(QMainWindow):
         rol = selectorTables.autenticar_usuario(user, password,ip)
         Permisos = rol["permisos"]
         tablas = selectorTables.mostrar_tablas_disponibles(Permisos)
+        widget = TableWidget(tablas)
+        widget.show()
         print("Tablas disponibles:", tablas)
+
+   
