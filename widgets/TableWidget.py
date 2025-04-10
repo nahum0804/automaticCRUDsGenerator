@@ -1,12 +1,14 @@
-from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QFrame, QMainWindow)
+from PyQt5.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
+                            QFrame, QPushButton, QLabel)
 from PyQt5.QtCore import Qt
-from .MainMenu import MainMenu
+from widgets.MainMenu import MainMenu
 
-class TableWidget(QMainWindow):  # Cambié QWidget por QMainWindow
+class TableWidget(QMainWindow):
     def __init__(self, tablas, parent=None):
         super().__init__(parent)
+        self.tablas_seleccionadas = []
         self.tablas = tablas
-        self.current_widget = None  # Inicializar el widget actual
+        self.current_widget = None
         self.setup_ui()
 
     def setup_ui(self):
@@ -40,6 +42,26 @@ class TableWidget(QMainWindow):  # Cambié QWidget por QMainWindow
             QPushButton:pressed {
                 background-color: #1B5E20;
             }
+            QPushButton:checked {
+                background-color: #1B5E20;
+            }
+            QPushButtonConfirm {
+                background-color: #20aeff;
+                border: none;
+                border-radius: 8px;
+                padding: 14px;
+                color: #FFFFFF;
+                font-size: 16px;
+                font-weight: bold;
+                transition: all 0.3s;             
+            }
+            QPushButton#confirm_button {
+                background-color: #2196F3;
+                color: #FFFFFF;
+            }
+            QPushButton#confirm_button:hover {
+                background-color: #1111F3;
+            }
         """)
 
         # Layout principal
@@ -56,16 +78,24 @@ class TableWidget(QMainWindow):  # Cambié QWidget por QMainWindow
         self.title = QLabel("Tablas Disponibles")
         self.title.setAlignment(Qt.AlignCenter)
         self.title.setStyleSheet("font-size: 24px; font-weight: bold; color: #4CAF50;")
-
-        # Agregar el título
         form_layout.addWidget(self.title)
 
         # Agregar un botón por cada tabla
+        self.buttons = []
         for tabla in self.tablas:
             boton = QPushButton(tabla)
+            boton.setCheckable(True)  # Para permitir selección múltiple
             boton.setFixedHeight(50)
-            boton.clicked.connect(lambda checked, t=tabla: self.on_table_selected(t))
+            boton.clicked.connect(self.update_selection)
             form_layout.addWidget(boton)
+            self.buttons.append(boton)
+
+        self.confirm_button = QPushButton("Confirmar")
+        self.confirm_button.setObjectName("confirm_button")
+        self.confirm_button.setFixedHeight(50)
+        self.confirm_button.setEnabled(False)
+        self.confirm_button.clicked.connect(self.on_confirm)
+        form_layout.addWidget(self.confirm_button)
 
         form_container.setLayout(form_layout)
 
@@ -79,19 +109,27 @@ class TableWidget(QMainWindow):  # Cambié QWidget por QMainWindow
         main_layout.addLayout(central_layout)
         main_layout.addStretch()
 
-        # Establecer el layout en el widget central
         central_widget = QWidget()
         central_widget.setLayout(main_layout)
-        self.setCentralWidget(central_widget)  # Esto ahora funciona
+        self.setCentralWidget(central_widget)
 
-    def on_table_selected(self, tabla):
-        print(f"Se seleccionó la tabla: {tabla}")
+    def update_selection(self):
+        """Actualiza la lista de tablas seleccionadas cuando se hace clic en un botón"""
+        self.tablas_seleccionadas = []
+        for btn in self.buttons:
+            if btn.isChecked():
+                self.tablas_seleccionadas.append(btn.text())
         
-        # Si ya hay un widget actual, lo eliminamos
-        if self.current_widget:
-            self.current_widget.deleteLater()
+        # Habilitar el botón de confirmar si hay al menos una tabla seleccionada
+        self.confirm_button.setEnabled(len(self.tablas_seleccionadas) > 0)
 
-        # Crear y mostrar el nuevo MainMenu
-        self.main_menu = MainMenu()
-        self.setCentralWidget(self.main_menu)  # Establecer el nuevo widget
-        self.current_widget = self.main_menu  # Actualizar current_widget
+    def on_confirm(self):
+        if not self.tablas_seleccionadas:
+            return
+            
+        print(f"Tablas seleccionadas: {', '.join(self.tablas_seleccionadas)}")
+            
+        # Pasar las tablas seleccionadas al MainMenu
+        self.main_menu = MainMenu(self.tablas_seleccionadas)
+        self.setCentralWidget(self.main_menu)
+        self.current_widget = self.main_menu

@@ -14,20 +14,20 @@ def autenticar_usuario(username, password,ip):
         # 2. Obtener el nombre del rol activo (ej: 'admin')
         cursor.execute("SELECT CURRENT_USER;")
         rol_nombre = cursor.fetchone()[0]
-        print("🔐 Usuario logueado (rol PostgreSQL):", rol_nombre)
+        print("Usuario logueado (rol PostgreSQL):", rol_nombre)
 
         # 3. Buscar el rol_id en la tabla roles
         cursor.execute("SELECT rol_id FROM roles WHERE nombre_rol = %s;", (rol_nombre,))
-        print("🔍 Buscando rol_id en la tabla 'roles' para el rol:", rol_nombre)
+        print("Buscando rol_id en la tabla 'roles' para el rol:", rol_nombre)
         resultado = cursor.fetchone()
-        print("🔍 Resultado de la búsqueda:", resultado)
+        print("Resultado de la búsqueda:", resultado)
         if not resultado:
-            print("❌ El rol no existe en la tabla 'roles'")
+            print("El rol no existe en la tabla 'roles'")
             conn.close()
             return None
         
         rol_id = resultado[0]
-        print("🔑 ID del rol:", rol_id)
+        print("ID del rol:", rol_id)
         # 4. Obtener los permisos asociados a ese rol
         cursor.execute("""
             SELECT p.nombre_permiso
@@ -35,9 +35,9 @@ def autenticar_usuario(username, password,ip):
             JOIN permisos p ON rp.permiso_id = p.permiso_id
             WHERE rp.rol_id = %s;
         """, (rol_id,))
-        print("🔍 Buscando permisos asociados al rol_id:", rol_id)
+        print("Buscando permisos asociados al rol_id:", rol_id)
         permisos = [fila[0] for fila in cursor.fetchall()]
-        print("📜 Permisos del rol:", permisos)
+        print("Permisos del rol:", permisos)
 
         return {
             "conn": conn,
@@ -47,26 +47,42 @@ def autenticar_usuario(username, password,ip):
         }
 
     except psycopg2.Error as e:
-        print("🚨 Error al conectar:", e)
+        print(" Error al conectar:", e)
         return None
     
 
 def mostrar_tablas_disponibles(permisos):
     tablas = {
         'productos:leer': 'Productos',
+        'productos:escribir': 'Productos',
+        'productos:actualizar': 'Productos',
+        'productos:eliminar': 'Productos',
         'pedidos:leer': 'Pedidos',
-        'clientes:leer': 'Clientes'
+        'pedidos:escribir': 'Pedidos',
+        'pedidos:actualizar': 'Pedidos',
+        'clientes:leer': 'Clientes',
+        'clientes:actualizar': 'Clientes',
+        'categorias:leer': 'Categorías',
+        'categorias:escribir': 'Categorías',
+        'categorias:actualizar': 'Categorías',
+        'categorias:eliminar': 'Categorías',
+        'proveedores:leer': 'Proveedores',
+        'proveedores:escribir': 'Proveedores',
+        'proveedores:actualizar': 'Proveedores',
+        'proveedores:eliminar': 'Proveedores'
     }
     
-    disponibles = []
+    # Usar un conjunto para evitar duplicados
+    tablas_disponibles = set()
+    
     for permiso, tabla in tablas.items():
         if permiso in permisos:
-            disponibles.append(tabla)
+            tablas_disponibles.add(tabla)
     
     print("\nTablas disponibles:")
-    for i, tabla in enumerate(disponibles, 1):
+    for i, tabla in enumerate(tablas_disponibles, 1):
         print(f"{i}. {tabla}")
     
-    return disponibles
+    return list(tablas_disponibles)
 
     
