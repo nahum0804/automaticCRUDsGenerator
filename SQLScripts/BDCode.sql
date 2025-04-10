@@ -1,20 +1,20 @@
 -- Categorías de productos
 CREATE TABLE categorias (
-    categoria_id INT AUTO_INCREMENT PRIMARY KEY,
+    categoria_id SERIAL PRIMARY KEY,
     nombre VARCHAR(50) NOT NULL,
     descripcion TEXT
 );
 
 -- Proveedores
 CREATE TABLE proveedores (
-    proveedor_id INT AUTO_INCREMENT PRIMARY KEY,
+    proveedor_id SERIAL PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     contacto VARCHAR(100)
 );
 
 -- Productos (relacionados con categorías y proveedores)
 CREATE TABLE productos (
-    producto_id INT AUTO_INCREMENT PRIMARY KEY,
+    producto_id SERIAL PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     precio DECIMAL(10, 2) NOT NULL,
     stock INT NOT NULL DEFAULT 0,
@@ -26,50 +26,48 @@ CREATE TABLE productos (
 
 -- Clientes
 CREATE TABLE clientes (
-    cliente_id INT AUTO_INCREMENT PRIMARY KEY,
+    cliente_id SERIAL PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL
 );
 
 -- Pedidos
+-- 1. Crear el tipo ENUM
+CREATE TYPE estado_pedido AS ENUM ('pendiente', 'completado', 'cancelado');
+
+-- 2. Crear la tabla usando el ENUM
 CREATE TABLE pedidos (
-    pedido_id INT AUTO_INCREMENT PRIMARY KEY,
+    pedido_id SERIAL PRIMARY KEY,
     cliente_id INT,
     fecha_pedido TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    estado ENUM('pendiente', 'completado', 'cancelado') DEFAULT 'pendiente',
+    estado estado_pedido DEFAULT 'pendiente',
     FOREIGN KEY (cliente_id) REFERENCES clientes(cliente_id)
 );
+select Tienda from Schema
 
 -- Roles de usuarios
 CREATE TABLE roles (
-    rol_id INT AUTO_INCREMENT PRIMARY KEY,
+    rol_id SERIAL PRIMARY KEY,
     nombre_rol VARCHAR(50) NOT NULL UNIQUE -- Ej: 'admin', 'inventario', 'vendedor'
 );
 
 -- Permisos específicos por recurso
 CREATE TABLE permisos (
-    permiso_id INT AUTO_INCREMENT PRIMARY KEY,
+    permiso_id SERIAL PRIMARY KEY,
     nombre_permiso VARCHAR(50) NOT NULL UNIQUE, -- Ej: 'productos:leer', 'pedidos:escribir'
     descripcion TEXT
 );
 
 -- Asignación de permisos a roles
 CREATE TABLE roles_permisos (
-    rol_id INT,
+    rol_id SERIAL,
     permiso_id INT,
     PRIMARY KEY (rol_id, permiso_id),
     FOREIGN KEY (rol_id) REFERENCES roles(rol_id),
     FOREIGN KEY (permiso_id) REFERENCES permisos(permiso_id)
 );
+--drop table usuarios
 
--- Usuarios del sistema
-CREATE TABLE usuarios (
-    usuario_id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50) NOT NULL UNIQUE,
-    password_hash VARCHAR(255) NOT NULL,
-    rol_id INT,
-    FOREIGN KEY (rol_id) REFERENCES roles(rol_id)
-);
 
 -- Permisos para productos
 INSERT INTO permisos (nombre_permiso, descripcion) VALUES
@@ -88,7 +86,7 @@ INSERT INTO permisos (nombre_permiso, descripcion) VALUES
 INSERT INTO permisos (nombre_permiso, descripcion) VALUES
     ('clientes:leer', 'Ver información de clientes'),
     ('clientes:actualizar', 'Editar datos de clientes');
-
+SELECT FROM roles
 -- Rol: Administrador (todos los permisos)
 INSERT INTO roles_permisos (rol_id, permiso_id)
 SELECT 1, permiso_id FROM permisos; -- Asume que rol_id 1 es 'admin'
@@ -151,18 +149,25 @@ INSERT INTO roles_permisos (rol_id, permiso_id) VALUES
     (4, 1); -- productos:leer
 
 --Insertar usuarios
--- Contraseñas: "password123" (encriptadas con bcrypt)
-INSERT INTO usuarios (username, password_hash, rol_id) VALUES
-    ('admin_juan', '$2a$12$4R3zl0Q1k6WZz7JcY9sBqO.1gT5dLx0XvLmZ8NfKj3hGvV1SdQWbC', 1), -- admin
-    ('manager_ana', '$2a$12$4R3zl0Q1k6WZz7JcY9sBqO.1gT5dLx0XvLmZ8NfKj3hGvV1SdQWbC', 2), -- manager
-    ('empleado_pedro', '$2a$12$4R3zl0Q1k6WZz7JcY9sBqO.1gT5dLx0XvLmZ8NfKj3hGvV1SdQWbC', 3), -- empleado
-    ('cliente_maria', '$2a$12$4R3zl0Q1k6WZz7JcY9sBqO.1gT5dLx0XvLmZ8NfKj3hGvV1SdQWbC', 4); -- cliente
 
+-- Rol admin: acceso total
+CREATE ROLE admin WITH LOGIN PASSWORD 'password_admin' SUPERUSER;
+
+-- Rol manager: permisos específicos
+CREATE ROLE manager WITH LOGIN PASSWORD 'password_manager';
+
+-- Rol empleado: solo lectura
+CREATE ROLE empleado WITH LOGIN PASSWORD 'password_empleado';
+
+-- Rol cliente: acceso limitado
+CREATE ROLE cliente WITH LOGIN PASSWORD 'password_cliente';
 --datos ejemplo de auditoria
-INSERT INTO auditoria (usuario_id, accion, tabla_afectada, registro_id) VALUES
-    (1, 'DELETE', 'productos', 3), -- admin_juan eliminó un producto
-    (2, 'UPDATE', 'pedidos', 2);   -- manager_ana actualizó un pedido
-
+--INSERT INTO auditoria (usuario_id, accion, tabla_afectada, registro_id) VALUES
+--    (1, 'DELETE', 'productos', 3), -- admin_juan eliminó un producto
+--    (2, 'UPDATE', 'pedidos', 2);   -- manager_ana actualizó un pedido
+GRANT SELECT ON roles TO PUBLIC;
+GRANT SELECT ON permisos TO PUBLIC;
+GRANT SELECT ON roles_permisos TO PUBLIC;
 --admin_juan puede hacer cualquier acción (CRUD completo).
 
 --manager_ana puede agregar/editar productos y actualizar pedidos, pero no eliminarlos.

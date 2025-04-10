@@ -3,7 +3,7 @@ from .LoginWidget import LoginWidget
 from .MainMenu import MainMenu
 import time 
 from db.dbConnector import PostgresDB   
-
+from helpers import selectorTables
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -31,7 +31,7 @@ class MainWindow(QMainWindow):
             host= credentials["ip"],
             user=credentials["user"],   
             password=credentials["password"],
-            database="usuariosdb"
+            database="Tienda"
         )
 
         # Intentar conectar
@@ -41,7 +41,7 @@ class MainWindow(QMainWindow):
             # if db.verificar_usuario(credentials["user"], credentials["password"]):
             #    self.login_widget.set_status("¡Conexión exitosa!")
             #    self.db = db
-            self.show_main_menu()
+            self.show_main_menu(credentials["user"], credentials["password"], credentials["ip"])
             #else:
             #    self.login_widget.set_status("Usuario o contraseña incorrectos", is_error=True)
             #    db.cerrar_conexion() 
@@ -58,7 +58,7 @@ class MainWindow(QMainWindow):
         
         self.login_widget.login_btn.clicked.connect(self.handle_login)
 
-    def show_main_menu(self):
+    def show_main_menu(self, user, password, ip):
         if self.current_widget:
             self.current_widget.deleteLater() 
 
@@ -66,3 +66,6 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.main_menu)
         self.current_widget = self.main_menu  
         print("Menú principal cargado correctamente.")
+        rol = selectorTables.autenticar_usuario(user, password,ip)
+        Permisos = rol["permisos"]
+        selectorTables.mostrar_tablas_disponibles(Permisos)
