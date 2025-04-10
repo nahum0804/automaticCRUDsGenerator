@@ -68,4 +68,5 @@ class MainWindow(QMainWindow):
         print("Menú principal cargado correctamente.")
         rol = selectorTables.autenticar_usuario(user, password,ip)
         Permisos = rol["permisos"]
-        selectorTables.mostrar_tablas_disponibles(Permisos)
+        tablas = selectorTables.mostrar_tablas_disponibles(Permisos)
+        print("Tablas disponibles:", tablas)

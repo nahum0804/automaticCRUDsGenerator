@@ -69,22 +69,4 @@ def mostrar_tablas_disponibles(permisos):
     
     return disponibles
 
-def obtener_permisos(conn, rol_id):
-    cursor = conn.cursor()
-    cursor.execute("""
-        SELECT p.nombre_permiso 
-        FROM permisos p
-        JOIN roles_permisos rp ON p.permiso_id = rp.permiso_id
-        WHERE rp.rol_id = %s
-    """, (rol_id,))
-
-def obtener_permisos(conn, rol_id):
-    cursor = conn.cursor()
-    cursor.execute("""
-        SELECT p.nombre_permiso 
-        FROM permisos p
-        JOIN roles_permisos rp ON p.permiso_id = rp.permiso_id
-        WHERE rp.rol_id = %s
-    """, (rol_id,))
     
-    return [permiso[0] for permiso in cursor.fetchall()]
