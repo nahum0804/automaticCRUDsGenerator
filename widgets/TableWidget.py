@@ -130,6 +130,6 @@ class TableWidget(QMainWindow):
         print(f"Tablas seleccionadas: {', '.join(self.tablas_seleccionadas)}")
             
         # Pasar las tablas seleccionadas al MainMenu
-        self.main_menu = MainMenu(self.tablas_seleccionadas)
+        self.main_menu = MainMenu(self.tablas_seleccionadas, self)
         self.setCentralWidget(self.main_menu)
         self.current_widget = self.main_menu
